@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finance Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        /* Quick inline overrides */
+        .hero-text { font-family: 'Space Grotesk', sans-serif; font-size: 66px; line-height: 0.91; letter-spacing: -1.32px; font-weight: 400; color: #202020; }
+        .section-label { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #4d4d4d; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media (max-width: 768px) { .hero-text { font-size: 36px; line-height: 1.0; letter-spacing: -0.02em; } }
+    </style>
+</head>
+<body style="background: #efefef;">
+    <!-- Floating Nav Capsule -->
+    <div style="display: flex; justify-content: center; padding: 20px 16px 0;">
+        <div class="nav-pill">
+            <a href="index.html" class="active">Trang chủ</a>
+            <a href="login.html">Đăng nhập</a>
+            <a href="login.html#register" class="nav-cta">Đăng ký</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section style="padding: 80px 20px 100px;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+            <!-- Left Column -->
+            <div>
+                <p class="section-label" style="margin-bottom: 16px;">Finance Tracker</p>
+                <h1 class="hero-text" style="margin-bottom: 24px;">
+                    Quản lý tài chính<br />
+                    thông minh &<br />
+                    dễ dàng
+                </h1>
+                <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; color: #4d4d4d; margin-bottom: 36px; max-width: 440px;">
+                    Theo dõi thu chi, đặt ngân sách và phân tích chi tiêu của bạn một cách hiệu quả.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="login.html#register" class="btn-filled">
+                        Bắt đầu miễn phí <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                    </a>
+                    <a href="#features" class="btn-outlined">
+                        Tìm hiểu thêm
+                    </a>
+                </div>
+                <!-- Partner strip -->
+                <div style="margin-top: 60px;">
+                    <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: #828282; margin-bottom: 16px;">Được xây dựng với Flask + Vanilla JS</p>
+                    <div style="display: flex; gap: 32px; color: #4d4d4d; font-size: 14px; font-weight: 500; opacity: 0.6;">
+                        <span>Flask</span>
+                        <span>MySQL</span>
+                        <span>Tailwind</span>
+                        <span>Chart.js</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column — Dashboard Preview Cards -->
+            <div style="position: relative; min-height: 480px;">
+                <!-- Card 1 -->
+                <div class="card card-elevated" style="position: absolute; top: 0; right: 0; width: 380px; z-index: 2; padding: 24px; box-shadow: 0 1px 3px rgba(32,32,32,0.04), 0 4px 12px rgba(32,32,32,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #828282;">Tổng quan</span>
+                        <span style="font-size: 12px; color: #828282;"><i class="fas fa-ellipsis-h"></i></span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #828282; margin-bottom: 4px;">Thu nhập</p>
+                            <p style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: #202020; letter-spacing: -0.02em;">15.2M</p>
+                        </div>
+                        <div>
+                            <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #828282; margin-bottom: 4px;">Chi tiêu</p>
+                            <p style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: #202020; letter-spacing: -0.02em;">8.7M</p>
+                        </div>
+                    </div>
+                    <!-- Mini chart -->
+                    <div style="height: 80px; position: relative; overflow: hidden;">
+                        <svg viewBox="0 0 200 60" style="width: 100%; height: 100%;">
+                            <path d="M0,50 Q25,35 50,40 T100,30 T150,20 T200,15" fill="none" stroke="#202020" stroke-width="2"/>
+                            <path d="M0,50 Q25,35 50,40 T100,30 T150,20 T200,15 L200,60 L0,60 Z" fill="#ff682c" opacity="0.15"/>
+                        </svg>
+                    </div>
+                </div>
+                <!-- Card 2 (stacked behind) -->
+                <div class="card" style="position: absolute; top: 30px; right: -20px; width: 380px; z-index: 1; padding: 24px; background: #fafafa; border: 1px solid #e8e8e8;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: #828282;">Chi tiêu theo danh mục</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span style="width: 8px; height: 8px; border-radius: 100%; background: #ff682c;"></span>
+                        <span style="font-size: 12px; color: #4d4d4d;">Ăn uống 42%</span>
+                        <span style="width: 8px; height: 8px; border-radius: 100%; background: #202020;"></span>
+                        <span style="font-size: 12px; color: #4d4d4d;">Di chuyển 28%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" style="padding: 80px 20px 100px; background: #ffffff;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <p class="section-label" style="margin-bottom: 8px; text-align: center;">Tính năng</p>
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; line-height: 1.13; letter-spacing: -0.8px; font-weight: 400; color: #202020; text-align: center; margin-bottom: 60px;">
+                Mọi thứ bạn cần
+            </h2>
+            <div class="grid-3">
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #ff682c; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-chart-line" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Dashboard</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">Theo dõi số dư, thu nhập và chi tiêu với biểu đồ trực quan.</p>
+                </div>
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #202020; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-exchange-alt" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Giao dịch</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">Thêm, sửa, xóa, lọc và tìm kiếm giao dịch nhanh chóng.</p>
+                </div>
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #816729; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-piggy-bank" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Ngân sách</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">Đặt ngân sách và nhận cảnh báo khi vượt mức.</p>
+                </div>
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #202020; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-chart-pie" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Báo cáo</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">Xem báo cáo thu/chi theo tháng, năm và xu hướng.</p>
+                </div>
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #ff682c; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-file-download" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Export CSV</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">Xuất dữ liệu ra CSV để lưu trữ hoặc xử lý thêm.</p>
+                </div>
+                <div class="card-sm" style="background: #f5f5f5;">
+                    <div style="width: 40px; height: 40px; background: #816729; border-radius: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="fas fa-shield-alt" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; letter-spacing: -0.02em; color: #202020; margin-bottom: 8px;">Bảo mật</h3>
+                    <p style="font-size: 14px; color: #4d4d4d; line-height: 1.5;">JWT Authentication và mã hóa mật khẩu an toàn.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 80px 20px; background: #ffffff;">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; line-height: 1.13; letter-spacing: -0.8px; font-weight: 400; color: #202020; margin-bottom: 12px;">
+                Sẵn sàng quản lý tài chính?
+            </h2>
+            <p style="font-size: 16px; color: #4d4d4d; margin-bottom: 36px;">
+                Đăng ký miễn phí và bắt đầu ngay hôm nay.
+            </p>
+            <a href="login.html#register" class="btn-filled" style="padding: 12px 28px;">
+                Đăng ký ngay <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="padding: 24px 20px; text-align: center;">
+        <p style="font-size: 13px; color: #828282;">
+            &copy; 2026 Finance Tracker — Flask + Vanilla JS
+        </p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+            });
+        });
+    </script>
+</body>
+</html>

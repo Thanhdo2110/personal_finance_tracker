@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danh mục — Finance Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <span><i class="fas fa-wallet" style="color:#ff682c;margin-right:8px;"></i>Finance</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="transactions.html"><i class="fas fa-exchange-alt"></i> Giao dịch</a>
+            <a href="categories.html" class="active"><i class="fas fa-tags"></i> Danh mục</a>
+            <a href="budgets.html"><i class="fas fa-piggy-bank"></i> Ngân sách</a>
+            <a href="reports.html"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-ghost" style="width:100%;justify-content:center;color:#c62828;">
+                <i class="fas fa-sign-out-alt" style="margin-right:6px;"></i> Đăng xuất
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;flex-wrap:wrap;gap:12px;">
+            <h1 class="page-title" style="margin-bottom:0;">Danh mục</h1>
+            <button onclick="openAddModal()" class="btn-filled small"><i class="fas fa-plus"></i> Thêm danh mục</button>
+        </div>
+
+        <div class="grid-2">
+            <!-- Income -->
+            <div class="card">
+                <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#2e7d32;margin-bottom:16px;">
+                    <i class="fas fa-arrow-down" style="margin-right:6px;"></i>Danh mục thu nhập
+                </p>
+                <div id="incomeCategories" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
+            <!-- Expense -->
+            <div class="card">
+                <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#c62828;margin-bottom:16px;">
+                    <i class="fas fa-arrow-up" style="margin-right:6px;"></i>Danh mục chi tiêu
+                </p>
+                <div id="expenseCategories" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="categoryModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <span class="modal-title" style="margin-bottom:0;" id="catModalTitle">Thêm danh mục</span>
+                <button onclick="closeCatModal()" class="btn-ghost"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="categoryForm">
+                <input type="hidden" id="catId" />
+                <div style="margin-bottom:12px;">
+                    <label for="catType">Loại</label>
+                    <select id="catType"><option value="expense">Chi tiêu</option><option value="income">Thu nhập</option></select>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label for="catName">Tên danh mục</label>
+                    <input type="text" id="catName" placeholder="Nhập tên danh mục" required />
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label>Màu sắc</label>
+                    <div id="colorPicker" style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button type="button" onclick="selectColor(this,'#EF4444')" class="color-swatch" style="background:#EF4444;"></button>
+                        <button type="button" onclick="selectColor(this,'#F97316')" class="color-swatch" style="background:#F97316;"></button>
+                        <button type="button" onclick="selectColor(this,'#F59E0B')" class="color-swatch" style="background:#F59E0B;"></button>
+                        <button type="button" onclick="selectColor(this,'#4CAF50')" class="color-swatch" style="background:#4CAF50;"></button>
+                        <button type="button" onclick="selectColor(this,'#2196F3')" class="color-swatch" style="background:#2196F3;"></button>
+                        <button type="button" onclick="selectColor(this,'#9C27B0')" class="color-swatch" style="background:#9C27B0;"></button>
+                        <button type="button" onclick="selectColor(this,'#E91E63')" class="color-swatch" style="background:#E91E63;"></button>
+                        <button type="button" onclick="selectColor(this,'#607D8B')" class="color-swatch" style="background:#607D8B;"></button>
+                        <button type="button" onclick="selectColor(this,'#ff682c')" class="color-swatch" style="background:#ff682c;"></button>
+                        <button type="button" onclick="selectColor(this,'#202020')" class="color-swatch" style="background:#202020;"></button>
+                    </div>
+                    <input type="hidden" id="catColor" value="#607D8B" />
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label for="catIcon">Icon (Emoji)</label>
+                    <input type="text" id="catIcon" value="📌" maxlength="4" />
+                </div>
+                <div id="catFormError" style="display:none;font-size:13px;color:#c62828;margin-bottom:12px;"></div>
+                <div style="display:flex;gap:8px;">
+                    <button type="submit" class="btn-filled" style="flex:1;justify-content:center;">Lưu</button>
+                    <button type="button" onclick="closeCatModal()" class="btn-outlined" style="flex:1;justify-content:center;">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/categories.js"></script>
+</body>
+</html>
