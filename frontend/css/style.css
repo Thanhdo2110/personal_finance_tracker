@@ -273,6 +273,8 @@ tr:hover td { background: var(--color-fog); }
 .progress-bar-fill.yellow { background: #ff9800; }
 .progress-bar-fill.red { background: #f44336; }
 
+.hidden { display: none !important; }
+
 /* Modal */
 .modal-overlay {
   position: fixed;

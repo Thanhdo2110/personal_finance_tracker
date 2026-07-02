@@ -4,7 +4,7 @@ let deleteTargetId = null;
 let currentPage = 1;
 let totalPages = 1;
 
-document.getElementById('welcomeUser').textContent = `Xin chào, ${currentUser?.username || ''}`;
+updateWelcomeUser();
 
 // Set default month filter to current month
 document.getElementById('filterMonth').value = new Date().toISOString().slice(0, 7);
@@ -131,7 +131,7 @@ function openAddModal() {
     document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('txType').value = 'expense';
     loadCategories();
-    document.getElementById('transactionModal').classList.remove('hidden');
+    showModal('transactionModal');
 }
 
 async function editTransaction(id) {
@@ -145,14 +145,14 @@ async function editTransaction(id) {
         document.getElementById('txAmount').value = data.amount;
         document.getElementById('txDate').value = data.transaction_date;
         document.getElementById('txDescription').value = data.description || '';
-        document.getElementById('transactionModal').classList.remove('hidden');
+        showModal('transactionModal');
     } catch (err) {
         showNotification(err.message, 'error');
     }
 }
 
 function closeModal() {
-    document.getElementById('transactionModal').classList.add('hidden');
+    hideModal('transactionModal');
 }
 
 document.getElementById('transactionForm').addEventListener('submit', async (e) => {
@@ -183,11 +183,11 @@ document.getElementById('transactionForm').addEventListener('submit', async (e) 
 
 function deleteTransaction(id) {
     deleteTargetId = id;
-    document.getElementById('deleteModal').classList.remove('hidden');
+    showModal('deleteModal');
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+    hideModal('deleteModal');
     deleteTargetId = null;
 }
 

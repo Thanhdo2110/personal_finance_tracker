@@ -2,7 +2,7 @@ requireAuth();
 let categories = [];
 let deleteTargetId = null;
 
-document.getElementById('welcomeUser').textContent = `Xin chào, ${currentUser?.username || ''}`;
+updateWelcomeUser();
 
 async function loadCategories() {
     try {
@@ -58,7 +58,7 @@ function openAddModal() {
     document.getElementById('catIcon').value = '📌';
     document.getElementById('catColor').value = '#6B7280';
     document.querySelectorAll('#colorPicker button').forEach(b => b.classList.remove('border-gray-800'));
-    document.getElementById('categoryModal').classList.remove('hidden');
+    showModal('categoryModal');
 }
 
 async function editCategory(id) {
@@ -80,7 +80,7 @@ async function editCategory(id) {
 }
 
 function closeCatModal() {
-    document.getElementById('categoryModal').classList.add('hidden');
+    hideModal('categoryModal');
 }
 
 document.getElementById('categoryForm').addEventListener('submit', async (e) => {

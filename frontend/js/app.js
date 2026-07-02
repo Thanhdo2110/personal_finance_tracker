@@ -6,15 +6,16 @@ let token = null;
 // Load token from localStorage
 function loadAuth() {
     token = localStorage.getItem('token');
-    currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+    const storedUser = localStorage.getItem('user');
+    currentUser = storedUser ? JSON.parse(storedUser) : null;
 }
 
 // Save auth to localStorage
 function saveAuth(tokenData, userData) {
     token = tokenData;
     currentUser = userData;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', token || '');
+    localStorage.setItem('user', JSON.stringify(userData || null));
 }
 
 // Clear auth
@@ -25,9 +26,34 @@ function clearAuth() {
     localStorage.removeItem('user');
 }
 
+// Update the welcome label if the page has one
+function updateWelcomeUser() {
+    const welcomeElement = document.getElementById('welcomeUser');
+    if (welcomeElement) {
+        welcomeElement.textContent = `Xin chào, ${currentUser?.username || ''}`;
+    }
+}
+
 // Check if authenticated
 function isAuthenticated() {
     return !!token;
+}
+
+// Modal helpers
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
 }
 
 // API call helper
@@ -45,10 +71,19 @@ async function apiCall(endpoint, method = 'GET', data = null) {
     }
 
     const response = await fetch(`${API_BASE}${endpoint}`, options);
-    const result = await response.json();
+    const responseText = await response.text();
+    let result = null;
+
+    if (responseText) {
+        try {
+            result = JSON.parse(responseText);
+        } catch (error) {
+            throw new Error('Máy chủ trả về dữ liệu không hợp lệ.');
+        }
+    }
 
     if (!response.ok) {
-        throw new Error(result.error || 'Có lỗi xảy ra');
+        throw new Error(result?.error || 'Có lỗi xảy ra');
     }
     return result;
 }

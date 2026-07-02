@@ -128,7 +128,7 @@ function updateRecentTransactions(transactions) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('welcomeUser').textContent = `Xin chào, ${currentUser?.username || ''}`;
+    updateWelcomeUser();
     setupYearSelector();
     setupMonthSelector();
     loadDashboard();

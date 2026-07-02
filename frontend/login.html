@@ -90,10 +90,11 @@
         e.preventDefault();
         var err = document.getElementById('loginError');
         try {
-            await apiCall('/auth/login', 'POST', {
+            const result = await apiCall('/auth/login', 'POST', {
                 username: document.getElementById('loginUsername').value,
                 password: document.getElementById('loginPassword').value
             });
+            saveAuth(result.access_token, result.user);
             window.location.href = 'dashboard.html';
         } catch (ex) { err.textContent = ex.message || 'Đăng nhập thất bại'; err.style.display = 'block'; }
     });

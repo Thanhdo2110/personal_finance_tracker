@@ -2,7 +2,7 @@ requireAuth();
 let monthlyChart = null;
 let categoryChart = null;
 
-document.getElementById('welcomeUser').textContent = `Xin chào, ${currentUser?.username || ''}`;
+updateWelcomeUser();
 
 // Year selector
 const yearSelect = document.getElementById('reportYear');

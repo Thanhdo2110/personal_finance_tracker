@@ -1,7 +1,7 @@
 requireAuth();
 let expenseCategories = [];
 
-document.getElementById('welcomeUser').textContent = `Xin chào, ${currentUser?.username || ''}`;
+updateWelcomeUser();
 
 // Set month/year to current
 const now = new Date();
@@ -90,11 +90,11 @@ function renderBudgets(budgets) {
 function openAddModal() {
     document.getElementById('budgetForm').reset();
     document.getElementById('budgetFormError').classList.add('hidden');
-    document.getElementById('budgetModal').classList.remove('hidden');
+    showModal('budgetModal');
 }
 
 function closeBudgetModal() {
-    document.getElementById('budgetModal').classList.add('hidden');
+    hideModal('budgetModal');
 }
 
 document.getElementById('budgetForm').addEventListener('submit', async (e) => {
