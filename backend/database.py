@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def get_db_connection():
     """Create and return a database connection"""
     try:
         connection = mysql.connector.connect(
             host=os.getenv('DB_HOST', 'localhost'),
+            port=int(os.getenv('DB_PORT', '3306')),
             user=os.getenv('DB_USER', 'root'),
             password=os.getenv('DB_PASSWORD', ''),
             database=os.getenv('DB_NAME', 'finance_tracker')
@@ -19,12 +21,16 @@ def get_db_connection():
         print(f"Error connecting to MySQL: {e}")
         return None
 
+
 def init_db():
     """Initialize database and create tables if they don't exist"""
+    connection = None
+    cursor = None
     try:
         # Connect without specifying database first
         connection = mysql.connector.connect(
             host=os.getenv('DB_HOST', 'localhost'),
+            port=int(os.getenv('DB_PORT', '3306')),
             user=os.getenv('DB_USER', 'root'),
             password=os.getenv('DB_PASSWORD', '')
         )
@@ -101,6 +107,7 @@ def init_db():
     except Error as e:
         print(f"Error initializing database: {e}")
     finally:
-        if connection.is_connected():
-            cursor.close()
+        if connection is not None and connection.is_connected():
+            if cursor is not None:
+                cursor.close()
             connection.close()

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from database import get_db_connection
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from mysql.connector import Error
 import re
 
 bcrypt = Bcrypt()
@@ -13,7 +14,10 @@ def is_valid_email(email):
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Dữ liệu đăng ký không hợp lệ'}), 400
+
     username = data.get('username', '').strip()
     email = data.get('email', '').strip()
     password = data.get('password', '')
@@ -75,12 +79,15 @@ def register():
             'user': {'id': user_id, 'username': username, 'email': email}
         }), 201
 
-    except Error as e:
-        conn.rollback()
-        return jsonify({'error': f'Lỗi: {str(e)}'}), 500
+    except Exception as e:
+        if conn is not None:
+            conn.rollback()
+        return jsonify({'error': f'Lỗi đăng ký: {str(e)}'}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
 
 @auth_bp.route('/login', methods=['POST'])
 def login():

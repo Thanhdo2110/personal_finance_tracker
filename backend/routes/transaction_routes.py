@@ -8,6 +8,38 @@ transaction_bp = Blueprint('transactions', __name__)
 def get_user_id():
     return int(get_jwt_identity())
 
+@transaction_bp.route('/<int:transaction_id>', methods=['GET'])
+@jwt_required()
+def get_transaction(transaction_id):
+    user_id = get_user_id()
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Lỗi kết nối database'}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT t.id, t.amount, t.type, t.description, t.transaction_date, t.created_at,
+                   c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon
+            FROM transactions t
+            JOIN categories c ON t.category_id = c.id
+            WHERE t.id = %s AND t.user_id = %s
+        """, (transaction_id, user_id))
+        transaction = cursor.fetchone()
+        if not transaction:
+            return jsonify({'error': 'Không tìm thấy giao dịch'}), 404
+
+        if isinstance(transaction['transaction_date'], (date, datetime)):
+            transaction['transaction_date'] = transaction['transaction_date'].isoformat()
+        if isinstance(transaction['created_at'], (date, datetime)):
+            transaction['created_at'] = transaction['created_at'].isoformat()
+        transaction['amount'] = float(transaction['amount'])
+
+        return jsonify(transaction), 200
+    finally:
+        cursor.close()
+        conn.close()
+
 @transaction_bp.route('', methods=['GET'])
 @jwt_required()
 def get_transactions():

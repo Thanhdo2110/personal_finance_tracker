@@ -3,14 +3,11 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
+from database import init_db
 import os
 
 # Load environment variables
 load_dotenv()
-
-# Initialize extensions
-bcrypt = Bcrypt()
-jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
@@ -21,9 +18,12 @@ def create_app():
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 
     # Initialize extensions
-    bcrypt.init_app(app)
-    jwt.init_app(app)
+    bcrypt = Bcrypt(app)
+    jwt = JWTManager(app)
     CORS(app)
+
+    # Initialize database schema if needed
+    init_db()
 
     # Import and register routes
     from routes.auth_routes import auth_bp
@@ -46,6 +46,8 @@ def create_app():
 
     return app
 
+# Create app instance
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
