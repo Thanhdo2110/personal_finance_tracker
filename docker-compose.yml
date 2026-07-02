@@ -1,0 +1,55 @@
+services:
+  finance-db:
+    image: mysql:8.0
+    container_name: finance-mysql-db
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 2110
+      MYSQL_DATABASE: finance_tracker
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - finance-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p2110"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - finance-network
+
+  finance-backend:
+    build: ./backend
+    container_name: finance-backend
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      DB_HOST: finance-mysql-db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: 2110
+      DB_NAME: finance_tracker
+    depends_on:
+      finance-db:
+        condition: service_healthy
+    networks:
+      - finance-network
+
+  finance-frontend:
+    build: ./frontend
+    container_name: finance-frontend
+    restart: always
+    ports:
+      - "3001:3001"         
+    networks:
+      - finance-network
+
+volumes:
+  finance-db-data:
+
+networks:
+  finance-network:
+    driver: bridge
