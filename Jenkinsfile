@@ -59,10 +59,30 @@ pipeline {
         }
        stage('Deploy to Dev (Docker Compose)') {
             steps {
-                echo "🐳 Đang deploy cập nhật môi trường Dev qua Docker Compose V2..."
+                echo "🐳 Đang deploy cập nhật môi trường Dev bằng Docker thuần..."
                 sh """
-                    # Nạp biến IMAGE_TAG chạy trước và gọi trực tiếp docker compose phiên bản mới
-                    IMAGE_TAG=${IMAGE_TAG} docker compose -f docker-compose.prod.yml up -d --force-recreate
+                    # 1. Dọn dẹp các container cũ nếu đang chạy để tránh trùng cổng (ports)
+                    docker rm -f finance-tracker-frontend-dev || true
+                    docker rm -f finance-tracker-backend-dev || true
+                    
+                    # 2. Tạo một Docker Network chung để Frontend và Backend có thể nói chuyện với nhau
+                    docker network create finance-tracker-network || true
+
+                    echo "🚀 Khởi chạy Backend Container..."
+                    docker run -d \
+                        --name finance-tracker-backend-dev \
+                        --network finance-tracker-network \
+                        -p 5001:5001 \
+                        ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
+
+                    echo "🚀 Khởi chạy Frontend Container..."
+                    docker run -d \
+                        --name finance-tracker-frontend-dev \
+                        --network finance-tracker-network \
+                        -p 3001:3001 \
+                        ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                        
+                    echo "✅ Môi trường Dev đã được cập nhật thành công!"
                 """
             }
         }
