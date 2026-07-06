@@ -57,16 +57,16 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Dev (Docker Compose)') {
+       stage('Deploy to Dev (Docker Compose)') {
             steps {
                 echo "🐳 Đang deploy cập nhật môi trường Dev qua Docker Compose..."
                 sh """
                     export IMAGE_TAG=${IMAGE_TAG}
-                    docker compose -f docker-compose.prod.yml up -d --force-recreate
+                    # Sử dụng lệnh có dấu gạch ngang để chỉ định file chuẩn xác
+                    docker-compose -f docker-compose.prod.yml up -d --force-recreate
                 """
             }
         }
-
         stage('Approval Gate') {
             steps {
                 // Tạm dừng đường ống để bạn check môi trường Dev ổn định rồi mới bấm Duyệt lên Prod K8s
