@@ -30,28 +30,28 @@ pipeline {
 
         stage('Push to AWS ECR') {
             steps {
-                echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
+                echo "🚀 Đang đăng nhập và push image lên AWS ECR bằng Token trực tiếp..."
                 sh """
-                    # 1. Cài đặt AWS CLI nếu chưa có
-                    if [ ! -d "./aws-cli-bin" ]; then
-                        echo "📦 Đang nạp bộ cài AWS CLI..."
-                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
-                        unzip -q -o awscliv2.zip
-                        ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin --update
-                    fi
-
-                    # 2. KHAI BÁO KEY AWS ACADEMY CỦA BẠN TẠI ĐÂY
-                    # Hãy mở tab "AWS CLI: Show" trên AWS Academy, copy và dán chính xác 3 chuỗi vào đây:
+                    # 1. Điền chính xác các thông tin Key lấy từ nút "AWS CLI: Show" trên AWS Academy
                     export AWS_ACCESS_KEY_ID="ĐIỀN_AWS_ACCESS_KEY_ID_VÀO_ĐÂY"
                     export AWS_SECRET_ACCESS_KEY="ĐIỀN_AWS_SECRET_ACCESS_KEY_VÀO_ĐÂY"
                     export AWS_SESSION_TOKEN="ĐIỀN_CHÂN_THỰC_CHUỖI_SESSION_TOKEN_SIÊU_DÀI_VÀO_ĐÂY"
-                    export AWS_DEFAULT_REGION="${AWS_REGION}"
 
-                    echo "🔐 Đang thực hiện login vào AWS ECR..."
-                    # Gọi chính xác file binary gốc trong thư mục v2 để né lỗi 'not found'
-                    ./aws-cli-bin/v2/current/bin/aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+                    echo "🔑 Đang sinh Token đăng nhập thông qua Docker container phụ trợ..."
                     
-                    echo "📤 Đang push các bản Docker Images lên ECR..."
+                    # Giải pháp đỉnh cao: Chạy một container aws-cli tạm thời để sinh mật khẩu rồi truyền ngược lại cho máy cha
+                    # Cách này giúp ta tận dụng lệnh aws chuẩn mà không sợ môi trường Jenkins bị thiếu thư viện nền
+                    
+                    AWS_TOKEN=\$(docker run --rm \
+                        -e AWS_ACCESS_KEY_ID=\$AWS_ACCESS_KEY_ID \
+                        -e AWS_SECRET_ACCESS_KEY=\$AWS_SECRET_ACCESS_KEY \
+                        -e AWS_SESSION_TOKEN=\$AWS_SESSION_TOKEN \
+                        amazon/aws-cli ecr get-login-password --region ${AWS_REGION})
+
+                    echo "🔐 Tiến hành đăng nhập Docker vào ECR Registry..."
+                    echo "\$AWS_TOKEN" | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+
+                    echo "📤 Đang đẩy các bản Docker Images lên AWS ECR..."
                     docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
                     docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
                     docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
