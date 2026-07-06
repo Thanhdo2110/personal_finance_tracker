@@ -31,37 +31,32 @@ pipeline {
         stage('Push to AWS ECR') {
             steps {
                 echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
-                withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', 
-                                                 usernameVariable: 'AWS_ACCESS_KEY_ID', 
-                                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    sh """
-                        # 1. Cài đặt nhanh AWS CLI nếu chưa tồn tại trong workspace
-                        if [ ! -f "./aws-cli-bin/aws" ]; then
-                            echo "📦 Đang cài đặt AWS CLI lightweight vào workspace..."
-                            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
-                            unzip -q -o awscliv2.zip
-                            ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin --update
-                        fi
+                sh """
+                    # 1. Cài đặt AWS CLI nếu chưa có
+                    if [ ! -d "./aws-cli-bin" ]; then
+                        echo "📦 Đang nạp bộ cài AWS CLI..."
+                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
+                        unzip -q -o awscliv2.zip
+                        ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin --update
+                    fi
 
-                        # 2. Đồng bộ các biến môi trường AWS (Lấy từ credentials)
-                        export AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID}
-                        export AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY}
-                        
-                        # ⚠️ LƯU Ý CHO AWS ACADEMY: Nếu tài khoản lab của bạn yêu cầu Session Token, 
-                        # bạn có thể tạm thời bỏ dấu '#' ở dòng dưới và dán token vào nếu gặp lỗi nạp quyền:
-                        # export AWS_SESSION_TOKEN="ĐIỀN_TOKEN_NẾU_BỊ_BÁO_LỖI_AUTH"
+                    # 2. KHAI BÁO KEY AWS ACADEMY CỦA BẠN TẠI ĐÂY
+                    # Hãy mở tab "AWS CLI: Show" trên AWS Academy, copy và dán chính xác 3 chuỗi vào đây:
+                    export AWS_ACCESS_KEY_ID="ĐIỀN_AWS_ACCESS_KEY_ID_VÀO_ĐÂY"
+                    export AWS_SECRET_ACCESS_KEY="ĐIỀN_AWS_SECRET_ACCESS_KEY_VÀO_ĐÂY"
+                    export AWS_SESSION_TOKEN="ĐIỀN_CHÂN_THỰC_CHUỖI_SESSION_TOKEN_SIÊU_DÀI_VÀO_ĐÂY"
+                    export AWS_DEFAULT_REGION="${AWS_REGION}"
 
-                        echo "🔐 Đang thực hiện login vào AWS ECR..."
-                        # Gọi chính xác file aws vừa cài đặt trong thư mục bằng lệnh ./aws-cli-bin/aws
-                        ./aws-cli-bin/aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
-                        
-                        echo "📤 Đang push các bản Docker Images lên ECR..."
-                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
-                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
-                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
-                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest
-                    """
-                }
+                    echo "🔐 Đang thực hiện login vào AWS ECR..."
+                    # Gọi chính xác file binary gốc trong thư mục v2 để né lỗi 'not found'
+                    ./aws-cli-bin/v2/current/bin/aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+                    
+                    echo "📤 Đang push các bản Docker Images lên ECR..."
+                    docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
+                    docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                    docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
+                    docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest
+                """
             }
         }
         stage('Deploy to Dev (Docker Compose)') {
