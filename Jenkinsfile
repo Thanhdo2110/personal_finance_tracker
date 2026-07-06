@@ -35,33 +35,27 @@ pipeline {
                                                  usernameVariable: 'AWS_ACCESS_KEY_ID', 
                                                  passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh """
-                        # Tự động cài đặt AWS CLI dạng lightweight (nếu chưa có) hoặc dùng fallback login bằng Docker
-                        # Giải pháp tối ưu hóa: Dùng API mã hóa để lấy Token đăng nhập thẳng vào Docker
-                        
-                        echo "Thực hiện đăng nhập ECR không cần công cụ AWS CLI..."
-                        
-                        # Sử dụng TOKEN thu được bằng cách giả lập auth thông qua biến môi trường bí mật
-                        # Bằng cách ép Docker nhận diện Registry AWS qua config
-                        
-                        # Cách đơn giản nhất cho Jenkins Container: Chạy login bằng token được pass từ bên ngoài
-                        # Nếu máy có curl, ta lấy token trực tiếp qua API AWS
-                        
-                        # Bản sửa lỗi không phụ thuộc vào lệnh 'aws':
-                        # Chúng ta tạm thời bypass qua bước login kiểm tra bằng cách cài đặt nhanh aws-cli vào workspace hoặc dùng fallback:
-                        
-                        if ! command -v aws &> /dev/null
-                        then
-                            echo "⚠️ Không tìm thấy lệnh aws trong Jenkins container. Tiến hành cài đặt nhanh..."
+                        # 1. Cài đặt nhanh AWS CLI nếu chưa tồn tại trong workspace
+                        if [ ! -f "./aws-cli-bin/aws" ]; then
+                            echo "📦 Đang cài đặt AWS CLI lightweight vào workspace..."
                             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
-                            unzip -q awscliv2.zip
-                            ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin
-                            export PATH="\$PATH:\$(pwd)/aws-cli-bin"
+                            unzip -q -o awscliv2.zip
+                            ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin --update
                         fi
 
-                        # Lúc này chắc chắn hệ thống đã có lệnh aws để chạy tiếp
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+                        # 2. Đồng bộ các biến môi trường AWS (Lấy từ credentials)
+                        export AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID}
+                        export AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY}
                         
-                        # Đẩy cả bản tag commit và bản latest lên ECR
+                        # ⚠️ LƯU Ý CHO AWS ACADEMY: Nếu tài khoản lab của bạn yêu cầu Session Token, 
+                        # bạn có thể tạm thời bỏ dấu '#' ở dòng dưới và dán token vào nếu gặp lỗi nạp quyền:
+                        # export AWS_SESSION_TOKEN="ĐIỀN_TOKEN_NẾU_BỊ_BÁO_LỖI_AUTH"
+
+                        echo "🔐 Đang thực hiện login vào AWS ECR..."
+                        # Gọi chính xác file aws vừa cài đặt trong thư mục bằng lệnh ./aws-cli-bin/aws
+                        ./aws-cli-bin/aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+                        
+                        echo "📤 Đang push các bản Docker Images lên ECR..."
                         docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
                         docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
                         docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
