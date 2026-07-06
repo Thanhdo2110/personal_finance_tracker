@@ -59,11 +59,10 @@ pipeline {
         }
        stage('Deploy to Dev (Docker Compose)') {
             steps {
-                echo "🐳 Đang deploy cập nhật môi trường Dev qua Docker Compose..."
+                echo "🐳 Đang deploy cập nhật môi trường Dev qua Docker Compose V2..."
                 sh """
-                    export IMAGE_TAG=${IMAGE_TAG}
-                    # Sử dụng lệnh có dấu gạch ngang để chỉ định file chuẩn xác
-                    docker-compose -f docker-compose.prod.yml up -d --force-recreate
+                    # Nạp biến IMAGE_TAG chạy trước và gọi trực tiếp docker compose phiên bản mới
+                    IMAGE_TAG=${IMAGE_TAG} docker compose -f docker-compose.prod.yml up -d --force-recreate
                 """
             }
         }
