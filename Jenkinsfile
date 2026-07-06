@@ -31,15 +31,20 @@ pipeline {
         stage('Push to AWS ECR') {
             steps {
                 echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
-                // Sử dụng AWS Credentials đã cấu hình trên Jenkins (ID: aws-credentials-id)
-                withAWS(credentials: 'aws-credentials-id', region: "${AWS_REGION}") {
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}"
-                    
-                    // Đẩy cả bản tag commit và bản latest lên ECR
-                    sh "docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}"
-                    sh "docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}"
-                    sh "docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest"
-                    sh "docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest"
+                // Thay thế withAWS bằng cặp quản lý credentials cơ bản dạng AWS_ACCESS_KEY_ID và AWS_SECRET_ACCESS_KEY
+                withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', 
+                                                 usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh """
+                        # Đăng nhập vào AWS ECR sử dụng biến môi trường credentials
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
+                        
+                        # Đẩy cả bản tag commit và bản latest lên ECR
+                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
+                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
+                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest
+                    """
                 }
             }
         }
@@ -57,7 +62,7 @@ pipeline {
         stage('Approval Gate') {
             steps {
                 // Tạm dừng đường ống để bạn check môi trường Dev ổn định rồi mới bấm Duyệt lên Prod K8s
-                input message: 'Bạn có duyệt triển khai ứng dụng lên cụm Production (Kubernetes Kind) không?', ok: 'Triển khai ngay!ahihi'
+                input message: 'Bạn có duyệt triển khai ứng dụng lên cụm Production (Kubernetes Kind) không?', ok: 'Triển khai ngay!'
             }
         }
 
