@@ -31,12 +31,34 @@ pipeline {
         stage('Push to AWS ECR') {
             steps {
                 echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
-                // Thay thế withAWS bằng cặp quản lý credentials cơ bản dạng AWS_ACCESS_KEY_ID và AWS_SECRET_ACCESS_KEY
                 withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', 
                                                  usernameVariable: 'AWS_ACCESS_KEY_ID', 
                                                  passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh """
-                        # Đăng nhập vào AWS ECR sử dụng biến môi trường credentials
+                        # Tự động cài đặt AWS CLI dạng lightweight (nếu chưa có) hoặc dùng fallback login bằng Docker
+                        # Giải pháp tối ưu hóa: Dùng API mã hóa để lấy Token đăng nhập thẳng vào Docker
+                        
+                        echo "Thực hiện đăng nhập ECR không cần công cụ AWS CLI..."
+                        
+                        # Sử dụng TOKEN thu được bằng cách giả lập auth thông qua biến môi trường bí mật
+                        # Bằng cách ép Docker nhận diện Registry AWS qua config
+                        
+                        # Cách đơn giản nhất cho Jenkins Container: Chạy login bằng token được pass từ bên ngoài
+                        # Nếu máy có curl, ta lấy token trực tiếp qua API AWS
+                        
+                        # Bản sửa lỗi không phụ thuộc vào lệnh 'aws':
+                        # Chúng ta tạm thời bypass qua bước login kiểm tra bằng cách cài đặt nhanh aws-cli vào workspace hoặc dùng fallback:
+                        
+                        if ! command -v aws &> /dev/null
+                        then
+                            echo "⚠️ Không tìm thấy lệnh aws trong Jenkins container. Tiến hành cài đặt nhanh..."
+                            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" > /dev/null
+                            unzip -q awscliv2.zip
+                            ./aws/install -i ./aws-cli-bin -b ./aws-cli-bin
+                            export PATH="\$PATH:\$(pwd)/aws-cli-bin"
+                        fi
+
+                        # Lúc này chắc chắn hệ thống đã có lệnh aws để chạy tiếp
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_REGISTRY}
                         
                         # Đẩy cả bản tag commit và bản latest lên ECR
@@ -48,7 +70,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy to Dev (Docker Compose)') {
             steps {
                 echo "🐳 Đang deploy cập nhật môi trường Dev qua Docker Compose..."
