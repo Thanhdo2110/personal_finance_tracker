@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-backend
+  namespace: finance-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: finance-backend
+  template:
+    metadata:
+      labels:
+        app: finance-backend
+    spec:
+      containers:
+      - name: backend
+        image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5001
+        env:
+        - name: DB_HOST
+          value: "db-finance-tracker.cwholn2fehh0.us-east-1.rds.amazonaws.com"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          value: "admin"
+        - name: DB_PASSWORD
+          value: "21102005"
+        - name: DB_NAME
+          value: "finance_tracker"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: finance-backend-service
+  namespace: finance-apps
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5001
+    targetPort: 5001
+  selector:
+    app: finance-backend
