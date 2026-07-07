@@ -66,7 +66,7 @@ pipeline {
                         # 2. Tạo một Docker Network chung để Frontend và Backend có thể nói chuyện với nhau
                         docker network create finance-tracker-network || true
 
-                        echo "🚀 Khởi chạy Backend Container....."
+                        echo "🚀 Khởi chạy Backend Container......."
                         docker run -d \\
                             --name finance-tracker-backend-dev \\
                             --network finance-tracker-network \\
