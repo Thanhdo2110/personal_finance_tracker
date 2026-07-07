@@ -32,25 +32,27 @@ pipeline {
         }
 
         stage('Push to AWS ECR') {
-            steps {
-                echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
-                withCredentials([file(credentialsId: 'aws-creds-file', variable: 'AWS_CRED_FILE')]) {
-                    sh """
-                        export AWS_SHARED_CREDENTIALS_FILE=\$AWS_CRED_FILE
+             steps {
+                 echo "🚀 Đang đăng nhập và push image lên AWS ECR..."
+                  withCredentials([
+               string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+              string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+               string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+        ]) {
+            sh """
+                echo "🔐 Đăng nhập Docker vào ECR Registry...."
+                aws ecr get-login-password --region ${AWS_REGION} | \
+                  docker login --username AWS --password-stdin ${AWS_REGISTRY}
 
-                        echo "🔐 Đăng nhập Docker vào ECR Registry..."
-                        aws ecr get-login-password --region ${AWS_REGION} | \
-                          docker login --username AWS --password-stdin ${AWS_REGISTRY}
-
-                        echo "📤 Đang đẩy các bản Docker Images lên AWS ECR..."
-                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
-                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
-                        docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
-                        docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest
-                    """
-                }
-            }
+                echo "📤 Đang đẩy các bản Docker Images lên AWS ECR..."
+                docker push ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
+                docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                docker push ${AWS_REGISTRY}/${BACKEND_REPO}:latest
+                docker push ${AWS_REGISTRY}/${FRONTEND_REPO}:latest
+            """
         }
+    }
+}
 
         stage('Deploy to Dev (Docker Compose)') {
             steps {
