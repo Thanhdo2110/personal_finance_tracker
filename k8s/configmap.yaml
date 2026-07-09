@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finance-config
+  namespace: finance-apps
+
+data:
+  FLASK_ENV: production
+
+  FLASK_APP: app.py
+
+  APP_PORT: "5001"

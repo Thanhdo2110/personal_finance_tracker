@@ -1,13 +1,24 @@
-FROM node:18-alpine 
+# Build Stage
+
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json  ./
+COPY package*.json ./
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 3001
+RUN npm run build
 
-CMD ["npm","run","dev","--","--port","3001","--host"]
+# Production Stage
+FROM nginx:stable-alpine
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx","-g","daemon off;"]

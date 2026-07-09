@@ -1,24 +1,55 @@
-version: '3.8'
+version: "3.9"
 
 services:
+
   finance-backend:
+
     image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:latest
+
     container_name: finance-backend-prod
-    restart: always
+
+    restart: unless-stopped
+
     ports:
       - "5001:5001"
+
     environment:
       DB_HOST: db-finance-tracker.cwholn2fehh0.us-east-1.rds.amazonaws.com
       DB_PORT: 3306
       DB_USER: admin
-      DB_PASSWORD: "21102005"
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: finance_tracker
 
+    healthcheck:
+      test: ["CMD","curl","-f","http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+    networks:
+      - finance-network
+
   finance-frontend:
+
     image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-frontend:latest
+
     container_name: finance-frontend-prod
-    restart: always
+
+    restart: unless-stopped
+
+    depends_on:
+      - finance-backend
+
     ports:
-      - "3001:3001"
+      - "3001:80"
+
     environment:
-      VITE_APP_BACKEND_URL: "http://98.91.108.120:5001"
+      VITE_API_URL: http://finance-backend:5001
+
+    networks:
+      - finance-network
+
+networks:
+
+  finance-network:
+    driver: bridge

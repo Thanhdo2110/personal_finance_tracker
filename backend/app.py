@@ -9,23 +9,25 @@ import os
 # Load environment variables
 load_dotenv()
 
+
 def create_app():
     app = Flask(__name__)
 
     # Configuration
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 
     # Initialize extensions
-    bcrypt = Bcrypt(app)
-    jwt = JWTManager(app)
+    Bcrypt(app)
+    JWTManager(app)
+
     CORS(app)
 
-    # Initialize database schema if needed
+    # Initialize database
     init_db()
 
-    # Import and register routes
+    # Register Blueprints
     from routes.auth_routes import auth_bp
     from routes.transaction_routes import transaction_bp
     from routes.category_routes import category_bp
@@ -33,21 +35,33 @@ def create_app():
     from routes.dashboard_routes import dashboard_bp
     from routes.report_routes import report_bp
 
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(transaction_bp, url_prefix='/api/transactions')
-    app.register_blueprint(category_bp, url_prefix='/api/categories')
-    app.register_blueprint(budget_bp, url_prefix='/api/budgets')
-    app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
-    app.register_blueprint(report_bp, url_prefix='/api/reports')
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(transaction_bp, url_prefix="/api/transactions")
+    app.register_blueprint(category_bp, url_prefix="/api/categories")
+    app.register_blueprint(budget_bp, url_prefix="/api/budgets")
+    app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
+    app.register_blueprint(report_bp, url_prefix="/api/reports")
 
-    @app.route('/api/health')
+    # Health Check API (for Kubernetes)
+    @app.route("/health")
     def health():
-        return {'status': 'ok'}
+        return {
+            "status": "UP",
+            "application": "Finance Tracker",
+            "environment": os.getenv("FLASK_ENV", "development")
+        }, 200
+
+    # Optional API Health
+    @app.route("/api/health")
+    def api_health():
+        return {
+            "status": "API OK"
+        }, 200
 
     return app
 
-# Create app instance
+
 app = create_app()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001)
