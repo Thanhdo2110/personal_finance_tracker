@@ -25,7 +25,7 @@ spec:
 
       - name: frontend
 
-        image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:initial
+        image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:latest
 
         imagePullPolicy: Always
 
