@@ -21,18 +21,20 @@ spec:
         app: finance-backend
 
     spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
+        - name: backend
+          image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:initial
 
-      - name: backend
+          imagePullPolicy: Always
 
-        image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:initial
-
-        imagePullPolicy: Always
-
-        ports:
+          ports:
         - containerPort: 5001
 
-        envFrom:
+          envFrom:
 
         - secretRef:
             name: finance-secret
@@ -40,7 +42,7 @@ spec:
         - configMapRef:
             name: finance-config
 
-        resources:
+          resources:
 
           requests:
             cpu: "100m"
@@ -50,7 +52,7 @@ spec:
             cpu: "500m"
             memory: "512Mi"
 
-        readinessProbe:
+          readinessProbe:
 
           httpGet:
             path: /health
@@ -59,7 +61,7 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 10
 
-        livenessProbe:
+          livenessProbe:
 
           httpGet:
             path: /health
