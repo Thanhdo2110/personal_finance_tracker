@@ -56,7 +56,7 @@ pipeline {
 
         stage('Deploy to Dev (Docker Compose)') {
             steps {
-                echo "🐳 Đang deploy cập nhật môi trường Dev bằng Docker thuần..."
+                echo "🐳 Đang deploy cập nhật môi trường Dev bằng Docker thuần......"
                 withCredentials([usernamePassword(credentialsId: 'mysql-db-creds', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD')]) {
                     sh """
                         # 1. Dọn dẹp các container cũ nếu đang chạy để tránh trùng cổng (ports)
