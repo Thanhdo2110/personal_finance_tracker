@@ -67,7 +67,7 @@ pipeline {
                         docker network create finance-tracker-network || true
 
                         echo "🚀 Khởi chạy Backend Container......."
-                        docker run -d \\
+                        docker run -d -t \\
                             --name finance-tracker-backend-dev \\
                             --network finance-tracker-network \\
                             -p 5001:5001 \\
@@ -79,7 +79,7 @@ pipeline {
                             ${AWS_REGISTRY}/${BACKEND_REPO}:${IMAGE_TAG}
 
                         echo "🚀 Khởi chạy Frontend Container..."
-                        docker run -d \\
+                        docker run -d -t \\
                             --name finance-tracker-frontend-dev \\
                             --network finance-tracker-network \\
                             -p 3001:3001 \\
