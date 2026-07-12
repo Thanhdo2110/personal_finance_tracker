@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
+from prometheus_flask_exporter import PrometheusMetrics
 from dotenv import load_dotenv
 from database import init_db
 import os
@@ -13,21 +14,51 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
 
+    # ==========================
     # Configuration
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
+    # ==========================
+    app.config["SECRET_KEY"] = os.getenv(
+        "SECRET_KEY",
+        "dev-secret-key"
+    )
+
+    app.config["JWT_SECRET_KEY"] = os.getenv(
+        "JWT_SECRET_KEY",
+        "jwt-secret-key"
+    )
+
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 
-    # Initialize extensions
+    # ==========================
+    # Prometheus Metrics
+    # ==========================
+    metrics = PrometheusMetrics(
+        app,
+        group_by="endpoint"
+    )
+
+    # Application information
+    metrics.info(
+        "app_info",
+        "Finance Tracker application information",
+        version="1.0.0"
+    )
+
+    # ==========================
+    # Initialize Extensions
+    # ==========================
     Bcrypt(app)
     JWTManager(app)
-
     CORS(app)
 
-    # Initialize database
+    # ==========================
+    # Database
+    # ==========================
     init_db()
 
+    # ==========================
     # Register Blueprints
+    # ==========================
     from routes.auth_routes import auth_bp
     from routes.transaction_routes import transaction_bp
     from routes.category_routes import category_bp
@@ -42,7 +73,9 @@ def create_app():
     app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
     app.register_blueprint(report_bp, url_prefix="/api/reports")
 
-    # Health Check API (for Kubernetes)
+    # ==========================
+    # Health Check
+    # ==========================
     @app.route("/health")
     def health():
         return {
@@ -51,7 +84,6 @@ def create_app():
             "environment": os.getenv("FLASK_ENV", "development")
         }, 200
 
-    # Optional API Health
     @app.route("/api/health")
     def api_health():
         return {
@@ -64,4 +96,7 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(
+        host="0.0.0.0",
+        port=5001
+    )

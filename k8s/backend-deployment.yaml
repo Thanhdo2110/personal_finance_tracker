@@ -77,7 +77,8 @@ spec:
     app: finance-backend
 
   ports:
-    - port: 5001
+    - name: http
+      port: 5001
       targetPort: 5001
 
   type: ClusterIP

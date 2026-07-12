@@ -2,8 +2,19 @@ from flask import Blueprint, request, jsonify
 from database import get_db_connection
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, date
+from prometheus_client import Counter
 
 transaction_bp = Blueprint('transactions', __name__)
+
+# =====================================================
+# Prometheus Business Metric
+# =====================================================
+
+transactions_created = Counter(
+    "finance_transactions_created_total",
+    "Total number of transactions created",
+    ["type"]          # income / expense
+)
 
 def get_user_id():
     return int(get_jwt_identity())
@@ -196,6 +207,10 @@ def create_transaction():
         )
         transaction_id = cursor.lastrowid
         conn.commit()
+
+        transactions_created.labels(
+             type=type_
+        ).inc()
 
         # Return the created transaction with category info
         cursor.execute("""
