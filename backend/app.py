@@ -2,10 +2,12 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-from prometheus_flask_exporter import PrometheusMetrics
 from dotenv import load_dotenv
 from database import init_db
 import os
+
+# 1. Import hàm khởi tạo từ file gộp monitoring.py của bạn
+from monitoring import init_monitoring
 
 # Load environment variables
 load_dotenv()
@@ -17,32 +19,18 @@ def create_app():
     # ==========================
     # Configuration
     # ==========================
-    app.config["SECRET_KEY"] = os.getenv(
-        "SECRET_KEY",
-        "dev-secret-key"
-    )
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
 
-    app.config["JWT_SECRET_KEY"] = os.getenv(
-        "JWT_SECRET_KEY",
-        "jwt-secret-key"
-    )
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
 
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 
     # ==========================
-    # Prometheus Metrics
+    # Kích hoạt Monitoring Tập Trung
     # ==========================
-    metrics = PrometheusMetrics(
-        app,
-        group_by="endpoint"
-    )
-
-    # Application information
-    metrics.info(
-        "app_info",
-        "Finance Tracker application information",
-        version="1.0.0"
-    )
+    # Gọi hàm này để tự động cài đặt hệ thống đo Latency 
+    # và mở luôn endpoint `/metrics`
+    init_monitoring(app)
 
     # ==========================
     # Initialize Extensions
@@ -81,14 +69,12 @@ def create_app():
         return {
             "status": "UP",
             "application": "Finance Tracker",
-            "environment": os.getenv("FLASK_ENV", "development")
+            "environment": os.getenv("FLASK_ENV", "development"),
         }, 200
 
     @app.route("/api/health")
     def api_health():
-        return {
-            "status": "API OK"
-        }, 200
+        return {"status": "API OK"}, 200
 
     return app
 
@@ -96,7 +82,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=5001
-    )
+    app.run(host="0.0.0.0", port=5001)

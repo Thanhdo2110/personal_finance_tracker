@@ -71,6 +71,8 @@ kind: Service
 metadata:
   name: finance-backend-service
   namespace: finance-apps
+  labels:
+    app: finance-backend
 
 spec:
   selector:
