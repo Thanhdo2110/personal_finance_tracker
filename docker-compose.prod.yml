@@ -5,11 +5,8 @@ services:
   finance-backend:
 
     image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:latest
-
     container_name: finance-backend-prod
-
     restart: unless-stopped
-
     ports:
       - "5001:5001"
 
@@ -25,31 +22,23 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
     networks:
       - finance-network
 
   finance-frontend:
-
     image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-frontend:latest
-
     container_name: finance-frontend-prod
-
     restart: unless-stopped
 
     depends_on:
       - finance-backend
-
     ports:
       - "3001:80"
-
     environment:
       VITE_API_URL: http://finance-backend:5001
-
     networks:
       - finance-network
 
 networks:
-
   finance-network:
     driver: bridge
