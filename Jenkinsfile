@@ -48,9 +48,9 @@ pipeline {
         stage('Login AWS ECR') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-                    string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+                    string(credentialsId: 'aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                    string(credentialsId: 'aws_session_token', variable: 'AWS_SESSION_TOKEN')
 
                 ]) {
                     sh """
