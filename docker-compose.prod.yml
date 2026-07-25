@@ -4,14 +4,14 @@ services:
 
   finance-backend:
 
-    image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-backend:latest
+    image: 208960448107.dkr.ecr.us-east-1.amazonaws.com/backend-finance-techies:latest
     container_name: finance-backend-prod
     restart: unless-stopped
     ports:
       - "5001:5001"
 
     environment:
-      DB_HOST: db-finance-tracker.cwholn2fehh0.us-east-1.rds.amazonaws.com
+      DB_HOST: database-1.cxnk8clzvd0u.us-east-1.rds.amazonaws.com
       DB_PORT: 3306
       DB_USER: admin
       DB_PASSWORD: ${DB_PASSWORD}
@@ -26,7 +26,7 @@ services:
       - finance-network
 
   finance-frontend:
-    image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-frontend:latest
+    image: 208960448107.dkr.ecr.us-east-1.amazonaws.com/frontend-finance-vntechies:latest
     container_name: finance-frontend-prod
     restart: unless-stopped
 
