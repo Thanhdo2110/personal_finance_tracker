@@ -28,7 +28,7 @@ spec:
 
       containers:
         - name: frontend
-          image: 552509717559.dkr.ecr.us-east-1.amazonaws.com/personal-finance-tracker-frontend:initial
+          image: 208960448107.dkr.ecr.us-east-1.amazonaws.com/frontend-finance-vntechies:initial
           imagePullPolicy: Always
 
           ports:
