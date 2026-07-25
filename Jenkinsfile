@@ -5,8 +5,8 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
         AWS_REGISTRY = '208960448107.dkr.ecr.us-east-1.amazonaws.com'
-        BACKEND_REPO = 'personal-finance-tracker-backend'
-        FRONTEND_REPO = 'personal-finance-tracker-frontend'
+        BACKEND_REPO = 'backend-finance-techies'
+        FRONTEND_REPO = 'frontend-finance-vntechies'
     }
 
     stages {
